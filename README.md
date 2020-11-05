@@ -13,3 +13,6 @@ Controls:
  - `d`: Rotate Clockwise
 
 You can toggle textures and minimap rays in the UI.
+
+### Screenshot:
+![Screenshot](./screenshot.png)
