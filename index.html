@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            border: 1px solid #333;
+        }
+
+        #gamescreen {
+            display: block;
+            margin: 0 auto;
+            height: 100vh;
+            width: 100vh;
+        }
+
+        #minimap {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            width: 150px;
+            height: auto;
+        }
+
+        .container {
+            display: block;
+            position: relative;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            padding-bottom: 15px;
+            background: rgba(190, 190, 190, 0.2);
+        }
+
+        .controls--row {
+            width: 100%;
+            padding-top: 15px;
+        }
+
+        button {
+            border: 1px solid #333;
+            background: #fff;
+            color: #333;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 250ms ease-in-out;
+            outline: none;
+        }
+
+        button:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        .controls button {
+            margin-left: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <canvas id="gamescreen"></canvas>
+        <canvas id="minimap"></canvas>
+        <div class="controls">
+            <div class="controls--row">
+                <button id="toggle_textures">Toggle Textures</button>
+                <button id="toggle_rays">Toggle Minimap Rays</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./src/index.ts"></script>
+</body>
+
+</html>
