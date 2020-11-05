@@ -1,6 +1,7 @@
 import { Camera } from '../camera/Camera';
 import { EventManager } from '../events/EventManager';
 import { Map } from '../map/Map';
+import { MapData } from '../map/map-data.interface';
 import { Player } from '../player/Player';
 import { Screen } from '../screen/Screen';
 import { World } from '../world/World';
@@ -8,26 +9,20 @@ import { GameOptions } from './game-options.interface';
 import { GameState } from './GameState.enum';
 
 export class Game {
-    private map: Map;
-    private minimap: Screen;
-    private gameScreen: Screen;
-    private player: Player;
-    private playerCamera: Camera;
-    private refreshRate: number;
-    private eventManager: EventManager;
-    private world: World;
+    private map: Map | null = null;
+    private minimap: Screen | null = null;
+    private gameScreen: Screen | null = null;
+    private player: Player | null = null;
+    private playerCamera: Camera | null = null;
+    private eventManager: EventManager | null = null;
+    private world: World | null = null;
 
-    private state: GameState = GameState.RUNNING;
+    private refreshRate: number;
+    private state: GameState = GameState.LOADING;
 
     constructor(options: GameOptions) {
-        this.map = this.setupMap(options);
-        this.playerCamera = this.setupPlayerCamera(options);
-        this.player = this.setupPlayer(options);
-        this.world = this.setupWorld();
-        this.gameScreen = this.setupGameScreen(options);
-        this.minimap = this.setupMinimap(options);
-        this.eventManager = this.setupEvents();
         this.refreshRate = options.refreshRate;
+        this.setupGame(options);
     }
 
     public loop() {
@@ -42,12 +37,12 @@ export class Game {
     public toggleProperty(property: string) {
         switch (property) {
             case 'textures': {
-                this.world.toggleTextures();
+                this.world?.toggleTextures();
                 break;
             }
 
             case 'rays': {
-                this.playerCamera.toggleRays();
+                this.playerCamera?.toggleRays();
 
             }
         }
@@ -56,7 +51,7 @@ export class Game {
     private step() {
         switch (this.state) {
             case GameState.RUNNING: {
-                this.eventManager.step();
+                this.eventManager?.step();
                 this.draw();
                 break;
             }
@@ -71,6 +66,10 @@ export class Game {
                 break;
             }
 
+            case GameState.LOADING: {
+                break;
+            }
+
             default: {
                 throw new Error(`UNKNOWN GAME STATE: ${this.state}`);
             }
@@ -78,54 +77,55 @@ export class Game {
     }
 
     private draw() {
-        this.world.injectRays(this.playerCamera.getBuffer());
-        this.minimap.draw();
-        this.gameScreen.draw();
+        this.world?.injectRays(this.playerCamera?.getBuffer() || []);
+        this.minimap?.draw();
+        this.gameScreen?.draw();
     }
 
-    private setupMap(options: GameOptions) {
-        return new Map(options.initialMap);
+    private async setupMap(options: GameOptions) {
+        const map = await this.loadMap(options.initialMapName);
+        return new Map(map);
     }
 
-    private setupMinimap(options: GameOptions) {
-        const minimap = new Screen('minimap', options.mapDimensions);
-        minimap.addLayer(this.map);
-        minimap.addLayer(this.player);
-        return minimap;
+    private async loadMap(path: string) {
+        const res = await fetch(path);
+        const data: MapData = await res.json();
+        return data;
     }
 
-    private setupPlayer(options: GameOptions) {
-        const { playerStart, initialMap, mapDimensions } = options;
-        const { dimensions } = initialMap;
+    private async setupGame(options: GameOptions) {
+        // Create Map
+        this.map = await this.setupMap(options);
+
+        // Get some constants
+        const { mapDimensions, playerStart } = options;
+        const { dimensions } = this.map.getData();
         const height = mapDimensions[1] / dimensions[1];
         const width = mapDimensions[0] / dimensions[0];
         const loc: [number, number] = [playerStart[0] * width, playerStart[1] * height];
-        return new Player(loc, width, height, this.map, this.playerCamera);
-    }
 
-    private setupEvents() {
-        const manager = new EventManager();
-        manager.addEventListener('keys', this.player);
-        return manager;
-    }
+        // Create Player Camera
+        this.playerCamera = new Camera(this.map, width, height);
 
-    private setupWorld() {
-        const world = new World(this.map);
-        return world;
-    }
+        // Create Player
+        this.player = new Player(loc, width, height, this.map, this.playerCamera);
 
-    private setupGameScreen(options: GameOptions) {
-        const gameScreen = new Screen('gamescreen', options.screenDimensions);
-        gameScreen.addLayer(this.world);
-        return gameScreen;
-    }
+        // Create Minimap
+        this.minimap = new Screen('minimap', options.mapDimensions);
+        this.minimap.addLayer(this.map);
+        this.minimap.addLayer(this.player);
 
-    private setupPlayerCamera(options: GameOptions) {
-        const { initialMap, mapDimensions } = options;
-        const { dimensions } = initialMap;
-        const height = mapDimensions[1] / dimensions[1];
-        const width = mapDimensions[0] / dimensions[0];
-        const playerCamera = new Camera(this.map, width, height);
-        return playerCamera;
+        // Create Events Manager
+        this.eventManager = new EventManager();
+        this.eventManager.addEventListener('keys', this.player);
+
+        // Create World
+        this.world = new World(this.map);
+
+        // Create Game Screen
+        this.gameScreen = new Screen('gamescreen', options.screenDimensions);
+        this.gameScreen.addLayer(this.world);
+
+        this.state = GameState.RUNNING;
     }
 }

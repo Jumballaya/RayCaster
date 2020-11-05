@@ -1,5 +1,4 @@
 import { Game } from "./game/Game";
-import mainMap from './assets/maps/main.json';
 
 const $toggleTexture = document.getElementById('toggle_textures');
 const $toggleRays = document.getElementById('toggle_rays');
@@ -10,7 +9,7 @@ const game = new Game({
     screenDimensions: [1000, 500],
     playerStart: [2, 1],
     refreshRate: 10,
-    initialMap: mainMap,
+    initialMapName: '/maps/main.json',
 });
 
 $toggleTexture?.addEventListener('click', (e) => {

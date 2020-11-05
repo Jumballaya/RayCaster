@@ -20,10 +20,12 @@ export class Map {
     private data: number[] = [];
     private name: string;
     private textures: Texture[] = [];
+    private mapData: MapData;
 
     private texturesLoaded = false;
 
     constructor(data: MapData) {
+        this.mapData = data;
         this.data = data.data;
         this.dimensions = data.dimensions;
         this.name = data.name;
@@ -57,6 +59,10 @@ export class Map {
 
     public texturesAreLoaded() {
         return this.texturesLoaded;
+    }
+
+    public getData() {
+        return this.mapData;
     }
 
     private coordInBounds([x, y]: [number, number]): boolean {

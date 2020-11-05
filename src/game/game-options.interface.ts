@@ -5,5 +5,5 @@ export interface GameOptions {
     screenDimensions: [number, number];
     playerStart: [number, number];
     refreshRate: number;
-    initialMap: MapData;
+    initialMapName: string;
 }

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel index.html",
+    "start": "parcel public/index.html",
     "lint": "tslint ./src/**/*.ts --fix"
   },
   "keywords": [],
@@ -22,7 +22,7 @@
     "src": "^1.1.2"
   },
   "staticFiles": {
-    "staticPath": "src/assets/textures",
+    "staticPath": "public/static",
     "watcherGlob": "**"
   }
 }
