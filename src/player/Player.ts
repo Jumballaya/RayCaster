@@ -40,7 +40,7 @@ export class Player implements Drawer, GameEventHandler {
         return this.pos;
     }
 
-    public drawTo(ctx: CanvasRenderingContext2D, dimensions: [number, number]) {
+    public drawTo(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = 'green';
         ctx.fillRect(this.pos[0], this.pos[1], this.width * 2, this.height * 2);
 
@@ -69,15 +69,15 @@ export class Player implements Drawer, GameEventHandler {
             }
 
             case 'w': {
-                const x = (this.pos[0]) + Math.sin(this.rotation / (Math.PI * 10));
-                const y = (this.pos[1]) + Math.cos(this.rotation / (Math.PI * 10));
+                const x = (this.pos[0]) + Math.sin(this.rotation * (Math.PI / 180));
+                const y = (this.pos[1]) + Math.cos(this.rotation * (Math.PI / 180));
                 this.changePos([x, y]);
                 break;
             }
 
             case 's': {
-                const x = (this.pos[0]) - Math.sin(this.rotation / (Math.PI * 10));
-                const y = (this.pos[1]) - Math.cos(this.rotation / (Math.PI * 10));
+                const x = (this.pos[0]) - Math.sin(this.rotation * (Math.PI / 180));
+                const y = (this.pos[1]) - Math.cos(this.rotation * (Math.PI / 180));
                 this.changePos([x, y]);
                 break;
             }

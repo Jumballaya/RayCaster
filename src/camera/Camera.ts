@@ -5,8 +5,9 @@ import { RayBuffer } from './ray-buffer.type';
 
 export class Camera {
 
-    private rayCount = 256;
+    private rayCount = 512;
     private raysOn = false;
+    private rayDegrees = 60;
 
     private rayBuffer: RayBuffer = [];
 
@@ -28,13 +29,14 @@ export class Camera {
         ctx.strokeStyle = 'red';
 
         this.rayBuffer = [];
-        for (let i = 0; i < this.rayCount; i++) {
-            const playerRotation = player.getRotation();
-            const playerPos = player.getPos();
-            const rotation = ((playerRotation + (i / 6)) - (this.rayCount / 12)) / (Math.PI * 10);
+        const rayStep = this.rayDegrees / this.rayCount;
+        const playerRotation = player.getRotation() - (this.rayDegrees / 2);
+        const playerPos = player.getPos();
+        for (let i = playerRotation; i < playerRotation + this.rayDegrees; i += rayStep) {
+            const rotation = (Math.PI / 180) * i;
             const center = {
-                x: playerPos[0] + (this.width / 2),
-                y: playerPos[1] + (this.height / 2),
+                x: playerPos[0] + (this.width),
+                y: playerPos[1] + (this.height),
             };
             let length = 1;
 
@@ -45,7 +47,7 @@ export class Camera {
                 const [inBounds, collided, value] = this.map.collision(coords);
                 if (inBounds && collided) {
                     if (!player.canCollide(value)) {
-                        this.rayBuffer.push({ value, distance: length });
+                        this.rayBuffer.push({ value, distance: length, coords });
                         break;
                     }
                 }

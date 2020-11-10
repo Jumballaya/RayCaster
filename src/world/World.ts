@@ -13,6 +13,8 @@ export class World implements Drawer {
         ctx.clearRect(0, 0, dimensions[0], dimensions[1]);
         const offset = dimensions[0] / this.rays.length;
 
+        let last: [number, number] = [0, 0];
+        let slice = 0;
         this.rays.reverse().forEach((ray, i) => {
             const x = (i * offset);
             const width = offset + 1;
@@ -20,7 +22,14 @@ export class World implements Drawer {
             const y = (dimensions[1] / 2) - (height / 2);
             const texture = this.map.selectTexture(ray.value);
             if (this.texturesOn && this.map.texturesAreLoaded() && texture.image) {
-                ctx.drawImage(texture.image, i, 0, 1, 256, x, y, width, height);
+                if (last[0] === ray.coords[0] && last[1] === ray.coords[1]) {
+                    slice++;
+                    slice = slice % 256;
+                } else {
+                    last = ray.coords;
+                    slice = 0;
+                }
+                ctx.drawImage(texture.image, slice, 0, width, 256, x + width, y, width, height);
             } else {
                 ctx.fillStyle = texture.color;
                 ctx.fillRect(x, y, width, height);
